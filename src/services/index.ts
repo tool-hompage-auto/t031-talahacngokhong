@@ -1,4 +1,4 @@
-import { FAKE_CATEGORIES, FAKE_POSTS, FAKE_SLIDES, getFakePostBySlug } from './mock-news-data';
+import { fakeCategories, fakePostsByCategory, fakeSlides, getFakePostBySlug } from './mock-news-data';
 import axios from "axios";
 import type { NewsCategory, NewsPost, RankingRow, SiteConfig, SlideItem } from "@/utils/types";
 
@@ -30,7 +30,7 @@ export const getCategories = async (): Promise<NewsCategory[]> => {
     });
     return res.data?.data ?? [];
   } catch (error) {
-    return FAKE_CATEGORIES;
+    return fakeCategories();
   }
 };
 
@@ -47,7 +47,7 @@ export const getPostsByCategory = async (categoryId: number, limit: number): Pro
     });
     return res.data?.data ?? [];
   } catch (error) {
-    return FAKE_POSTS.filter((p) => p.category_id === category_id).slice(0, limit);
+    return fakePostsByCategory(categoryId, limit);
   }
 };
 
@@ -59,7 +59,7 @@ export const getPostBySlug = async (slug: string): Promise<NewsPost | null> => {
     });
     return res.data?.data ?? null;
   } catch (error) {
-    return null;
+    return getFakePostBySlug(slug);
   }
 };
 
@@ -71,7 +71,7 @@ export const getSlides = async (): Promise<SlideItem[]> => {
     });
     return res.data?.data ?? [];
   } catch (error) {
-    return [];
+    return fakeSlides();
   }
 };
 

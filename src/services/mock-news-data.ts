@@ -90,9 +90,31 @@ export const FAKE_SLIDES = [
   { image: '/assets/_fake/slide-3.png', title: 'Slide demo 3', link: '#' },
 ];
 
-export function getFakePostBySlug(slug: string) {
-  const post = FAKE_POSTS.find((p) => p.slug === slug);
+// The helpers below are generic on purpose: each game types its own
+// NewsPost / NewsCategory / Slide differently, and the patched fallbacks must
+// compile against ANY of them (a build that fails on a fake-data type
+// mismatch is worse than no fake data). T is inferred from the function's
+// declared return type.
+export function fakeCategories<T = unknown>(): T[] {
+  return FAKE_CATEGORIES as unknown as T[];
+}
+
+export function fakeSlides<T = unknown>(): T[] {
+  return FAKE_SLIDES as unknown as T[];
+}
+
+// categoryId may be missing (then every post is returned) or numeric-like.
+export function fakePostsByCategory<T = unknown>(categoryId?: number | string | null, limit?: number): T[] {
+  const id = categoryId === undefined || categoryId === null || categoryId === '' ? null : Number(categoryId);
+  const list = id === null || Number.isNaN(id) ? FAKE_POSTS : FAKE_POSTS.filter((p) => p.category_id === id);
+  return (typeof limit === 'number' ? list.slice(0, limit) : list) as unknown as T[];
+}
+
+// key is a slug or a numeric id depending on how the game fetches the detail.
+export function getFakePostBySlug<T = unknown>(key: string | number): T | null {
+  const k = String(key);
+  const post = FAKE_POSTS.find((p) => p.slug === k || String(p.id) === k);
   if (!post) return null;
   const category = FAKE_CATEGORIES.find((c) => c.id === post.category_id);
-  return { ...post, category };
+  return { ...post, category } as unknown as T;
 }
